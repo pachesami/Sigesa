@@ -12,24 +12,57 @@ db.sqlite3
 # Django
 # ======================
 *.log
+static/
 staticfiles/
+mediafiles/
 
 # ======================
 # Node
 # ======================
 **/node_modules/
 **/dist/
+**/build/
 
 # ======================
 # Environment variables
 # ======================
 .env
 .env.*
+!.env.example
+
+# ======================
+# Testing
+# ======================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# ======================
+# Temp files
+# ======================
+*.swp
+*.tmp
+*.bak
+
+# ======================
+# Compiled
+# ======================
+*.so
+*.dll
+*.dylib
+
+# ======================
+# Security
+# ======================
+*.pem
+*.key
+*.crt
 
 # ======================
 # VSCode
 # ======================
 .vscode/
+.idea/
 
 # ======================
 # OS

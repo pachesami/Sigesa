@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-class UsersConfig(AppConfig):
+class AcademicConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "users"
-    verbose_name = "Usuarios y Roles"
+    name = "academic"
+    verbose_name = "Académico"

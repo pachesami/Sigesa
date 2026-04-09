@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-class UsersConfig(AppConfig):
+class EnrollmentConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "users"
-    verbose_name = "Usuarios y Roles"
+    name = "enrollment"
+    verbose_name = "Matrículas"
