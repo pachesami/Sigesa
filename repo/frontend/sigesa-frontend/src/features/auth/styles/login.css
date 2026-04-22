@@ -422,3 +422,11 @@
   line-height: 1;
   transform: translateY(-1px);
 }
+
+.login-error {
+  margin: -0.2rem 0 0;
+  color: #b42318;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
