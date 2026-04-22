@@ -1,0 +1,432 @@
+:root {
+  --page-bg: #171717;
+  --shell-bg: #ffffff;
+  --brown-900: #4d2d17;
+  --brown-700: #6b3d2e;
+  --brown-500: #8b5e3c;
+  --gold-500: #c4a35a;
+  --green-600: #1d8348;
+  --green-700: #166638;
+  --ink-900: #2a2a2a;
+  --ink-700: #525252;
+  --ink-500: #808080;
+  --line-soft: #d9d9d9;
+}
+
+.sigesa-login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.08), transparent 35%),
+    radial-gradient(circle at 90% 20%, rgba(196, 163, 90, 0.2), transparent 25%),
+    linear-gradient(140deg, #ffffff, var(--page-bg));
+  padding: 1.25rem;
+}
+
+.sigesa-login-shell {
+  position: relative;
+  width: min(1120px, 100%);
+  min-height: 620px;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  background: var(--shell-bg);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+  display: flex;
+  isolation: isolate;
+}
+
+.welcome-pane,
+.form-pane {
+  width: 50%;
+  min-height: 620px;
+}
+
+.welcome-pane {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem;
+  background: #fffdf9;
+  animation: rise-in 0.8s ease-out both;
+}
+
+.dot-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.23;
+  background-image: radial-gradient(circle, var(--brown-500) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 430px;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  animation: fade-up 0.9s ease-out 0.15s both;
+}
+
+.logo-wrap {
+  width: clamp(130px, 18vw, 190px);
+  height: clamp(130px, 18vw, 190px);
+  margin-bottom: 1.4rem;
+  border-radius: 999px;
+  padding: 0.3rem;
+  background: linear-gradient(135deg, #f8f8f8, #dfdfdf);
+}
+
+.school-logo {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 999px;
+}
+
+.welcome-title {
+  margin: 0;
+  color: var(--brown-900);
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2rem, 4vw, 2.85rem);
+  letter-spacing: 0.12em;
+  font-weight: 800;
+}
+
+.welcome-subtitle {
+  margin-top: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--brown-900);
+  font-family: 'Merriweather Sans', sans-serif;
+  letter-spacing: 0.16em;
+  font-size: clamp(0.95rem, 2vw, 1.08rem);
+}
+
+.welcome-subtitle .line {
+  display: inline-block;
+  width: clamp(28px, 4vw, 42px);
+  height: 2px;
+  border-radius: 99px;
+  background: var(--brown-900);
+}
+
+.welcome-slogan {
+  margin: 1rem 0 0;
+  color: var(--brown-900);
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.dots-indicator {
+  display: flex;
+  gap: 0.45rem;
+  margin: 1.3rem 0 1.9rem;
+}
+
+.dots-indicator span {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--gold-500);
+}
+
+.feature-list {
+  width: 100%;
+  max-width: 390px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.feature-item {
+  min-width: 95px;
+  display: grid;
+  justify-items: center;
+  gap: 0.48rem;
+  color: #3b3b3b;
+  font-size: 0.82rem;
+}
+
+.feature-item svg {
+  width: 2rem;
+  height: 2rem;
+  color: #3d3d3d;
+}
+
+.feature-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--line-soft);
+}
+
+.form-pane {
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.1), transparent 25%),
+    linear-gradient(145deg, #7a4a39, var(--brown-700));
+  animation: rise-in 0.8s ease-out 0.1s both;
+}
+
+.form-card {
+  width: min(420px, 100%);
+  border-radius: 1.7rem;
+  background: #ffffff;
+  padding: 2.15rem;
+  box-shadow: 0 18px 38px rgba(57, 30, 16, 0.28);
+}
+
+.form-card h2 {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+  color: #3d3d3d;
+  font-weight: 600;
+}
+
+.title-divider {
+  margin-top: 0.55rem;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #454545, transparent);
+}
+
+.login-form {
+  margin-top: 1.65rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.52rem;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-500);
+  font-size: 0.88rem;
+}
+
+.field input {
+  width: 100%;
+  border: 1px solid #e4e4e4;
+  border-radius: 0.72rem;
+  padding: 0.82rem 0.95rem;
+  font-size: 0.93rem;
+  color: var(--ink-700);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #ffffff;
+}
+
+.field input::placeholder {
+  color: #aaaaaa;
+}
+
+.field input:focus {
+  border-color: var(--brown-700);
+  box-shadow: 0 0 0 3px rgba(107, 61, 46, 0.13);
+}
+
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap input {
+  padding-right: 2.85rem;
+}
+
+.eye-toggle {
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #9a9a9a;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+}
+
+.eye-toggle:hover {
+  color: #595959;
+  background: #f4f4f4;
+}
+
+.submit-btn {
+  margin-top: 0.2rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--green-600);
+  color: #ffffff;
+  font-size: 0.93rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.submit-btn:hover {
+  background: var(--green-700);
+  transform: translateY(-1px);
+}
+
+.social-block {
+  margin-top: 1.8rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.62rem;
+}
+
+.social-block p {
+  margin: 0;
+  color: var(--ink-500);
+  font-size: 0.86rem;
+}
+
+.facebook-link {
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #1877f2;
+  color: #ffffff;
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.facebook-link:hover {
+  filter: brightness(0.95);
+  transform: scale(1.04);
+}
+
+.wave-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 88px;
+  pointer-events: none;
+}
+
+.wave-wrap svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 980px) {
+  .sigesa-login-shell {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .welcome-pane,
+  .form-pane {
+    width: 100%;
+    min-height: 0;
+  }
+
+  .welcome-pane {
+    padding-bottom: 1.6rem;
+  }
+
+  .form-pane {
+    padding-top: 1.2rem;
+    padding-bottom: 4.4rem;
+  }
+
+  .feature-list {
+    gap: 0.55rem;
+  }
+
+  .feature-item {
+    min-width: 85px;
+    font-size: 0.76rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .sigesa-login-page {
+    padding: 0.75rem;
+  }
+
+  .welcome-pane {
+    padding: 1.45rem 1.1rem;
+  }
+
+  .form-pane {
+    padding: 1.2rem 0.95rem 4.15rem;
+  }
+
+  .form-card {
+    border-radius: 1.3rem;
+    padding: 1.45rem;
+  }
+
+  .feature-list {
+    flex-wrap: wrap;
+    row-gap: 1rem;
+  }
+
+  .feature-divider {
+    display: none;
+  }
+
+  .wave-wrap {
+    height: 72px;
+  }
+}
+.facebook-letter {
+  font-size: 1.35rem;
+  font-family: 'Merriweather Sans', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.login-error {
+  margin: -0.2rem 0 0;
+  color: #b42318;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
