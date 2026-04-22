@@ -1,18 +1,18 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
-import Sidebar from '../components/Sidebar'
-import Header from '../components/Header'
+import Sidebar, { type NavItem } from '../../../components/layout/Sidebar'
+import Header from '../../../components/layout/Header'
 import StatsCards from '../components/StatsCards'
 import FilterPanel from '../components/FilterPanel'
-import PaymentsTable from '../components/PaymentsTable'
+import PagosTable from '../components/PagosTable'
 import { payments as allPayments } from '../data/mockData'
-import type { NavItem, Payment } from '../types'
+import type { Payment } from '../types'
 
 const ITEMS_PER_PAGE = 8
 const TOTAL_ITEMS = 1200
 const TOTAL_PAGES = Math.ceil(TOTAL_ITEMS / ITEMS_PER_PAGE)
 
-function PaymentsDashboardPage() {
+function PagosDashboardPage() {
   const [activeNav, setActiveNav] = useState<NavItem>('pagos')
   const [currentPage, setCurrentPage] = useState(1)
   const [desde, setDesde] = useState('01/04/2024')
@@ -67,7 +67,7 @@ function PaymentsDashboardPage() {
               setGrado={setGrado}
               onFilter={handleFilter}
             />
-            <PaymentsTable
+            <PagosTable
               payments={filteredPayments}
               currentPage={currentPage}
               totalPages={TOTAL_PAGES}
@@ -82,5 +82,4 @@ function PaymentsDashboardPage() {
   )
 }
 
-export default PaymentsDashboardPage
-
+export default PagosDashboardPage

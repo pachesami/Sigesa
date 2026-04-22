@@ -1,7 +1,7 @@
 import { Search, Download, Settings2, Filter, ChevronDown, Eye, Pencil, Trash2, ChevronLeft, ChevronRight, ChevronsRight, AlignJustify } from 'lucide-react';
 import type { Payment, PaymentStatus } from '../types';
 
-interface PaymentsTableProps {
+interface PagosTableProps {
   payments: Payment[];
   currentPage: number;
   totalPages: number;
@@ -21,7 +21,7 @@ function Avatar({ name }: { name: string }) {
   );
 }
 
-export default function PaymentsTable({ payments, currentPage, totalPages, totalItems, itemsPerPage, onPageChange }: PaymentsTableProps) {
+export default function PagosTable({ payments, currentPage, totalPages, totalItems, itemsPerPage, onPageChange }: PagosTableProps) {
   const start = (currentPage - 1) * itemsPerPage + 1;
   const end = Math.min(currentPage * itemsPerPage, totalItems);
 
@@ -170,4 +170,5 @@ export default function PaymentsTable({ payments, currentPage, totalPages, total
     </div>
   );
 }
+
 

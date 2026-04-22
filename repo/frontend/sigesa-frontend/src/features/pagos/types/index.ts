@@ -13,5 +13,3 @@ export interface Payment {
   avatarSeed: number;
   female?: boolean;
 }
-
-export type NavItem = 'dashboard' | 'estudiantes' | 'pagos' | 'cursos' | 'ajustes';

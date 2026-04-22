@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { LayoutDashboard, Users, Wallet, BookOpen, Settings, GraduationCap } from 'lucide-react';
-import type { NavItem } from '../types';
+
+export type NavItem = 'dashboard' | 'estudiantes' | 'pagos' | 'cursos' | 'ajustes';
 
 interface SidebarProps {
   active: NavItem;
@@ -43,4 +44,3 @@ export default function Sidebar({ active, onNavigate }: SidebarProps) {
     </aside>
   );
 }
-
