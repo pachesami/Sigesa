@@ -37,10 +37,8 @@ function PagosDashboardPage() {
 
   return (
     <div className="flex min-h-screen bg-gray-100 font-sans">
-      <Sidebar active={activeNav} onNavigate={setActiveNav} />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header />
 
         <main className="flex min-h-0 flex-1 flex-col gap-5 p-6">
           <div className="flex items-center justify-between">
