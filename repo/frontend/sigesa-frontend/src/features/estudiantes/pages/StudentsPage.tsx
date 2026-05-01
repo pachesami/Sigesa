@@ -32,6 +32,13 @@ export default function StudentsPage() {
 
   return (
     <div className="space-y-6">
+                <div className="flex items-center justify-between">
+            <nav className="flex items-center gap-1.5 text-sm text-gray-500">
+              <span className="cursor-pointer hover:text-gray-700">Dashboard</span>
+              <span className="text-gray-300">/</span>
+              <span className="font-semibold text-gray-800">Estudiantes</span>
+            </nav>
+          </div>
       <StudentForm onSave={handleSaveStudent} />
       <GuardiansList
         guardians={guardians}
