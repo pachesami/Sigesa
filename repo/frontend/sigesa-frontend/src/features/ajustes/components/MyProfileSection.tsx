@@ -1,62 +1,83 @@
-import { CreditCard as Edit2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Button, Group, TextInput, Badge, Alert } from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { usersService } from '../../../services/usersService';
+import type { Usuario } from '../../../types/auth';
+import { obtenerMensajeError } from '../../../utils/apiErrors';
 
 export default function MyProfileSection() {
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [error, setError] = useState('');
+  const [cargando, setCargando] = useState(false);
+
+  const form = useForm({
+    initialValues: {
+      username: '',
+      password: '',
+    },
+  });
+
+  const cargarPerfil = async () => {
+    try {
+      const data = await usersService.obtenerPerfil();
+      setUsuario(data);
+      form.setValues({
+        username: data.username,
+        password: '',
+      });
+    } catch (err) {
+      setError(obtenerMensajeError(err, 'No se pudo cargar el perfil.'));
+    }
+  };
+
+  useEffect(() => {
+    cargarPerfil();
+  }, []);
+
+  const handleSubmit = async (values: typeof form.values) => {
+    setError('');
+    try {
+      setCargando(true);
+      await usersService.actualizarPerfil({
+        username: values.username,
+        password: values.password || undefined,
+      });
+      await cargarPerfil();
+    } catch (err) {
+      setError(obtenerMensajeError(err, 'No se pudo actualizar el perfil.'));
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const roles = usuario?.roles?.map((rol) => rol.rol.nombre) ?? [];
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-gray-800 mb-6">Mi Perfil</h2>
+    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm space-y-6">
+      <h2 className="text-lg font-bold text-gray-800">Mi Perfil</h2>
 
-      <div className="flex items-start gap-8">
-        <div className="flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full bg-green-600 flex items-center justify-center text-white text-3xl font-bold">
-            AD
-          </div>
-          <p className="text-sm text-gray-600 mt-3">Administrador</p>
-        </div>
+      {error && <Alert color="red">{error}</Alert>}
 
-        <div className="flex-1 space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Usuario</label>
-            <input
-              type="text"
-              defaultValue="admin@escuela.com"
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-          </div>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Group align="flex-end" grow>
+          <TextInput label="Usuario" required {...form.getInputProps('username')} />
+          <TextInput label="Contrasena" type="password" placeholder="Nueva contrasena" {...form.getInputProps('password')} />
+          <Button type="submit" loading={cargando} className="bg-green-600 hover:bg-green-700">
+            Guardar
+          </Button>
+        </Group>
+      </form>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Contraseña</label>
-            <div className="flex gap-3">
-              <input
-                type="password"
-                defaultValue="••••••••"
-                disabled
-                className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-700 bg-gray-50"
-              />
-              <button className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-                Cambiar
-              </button>
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Estado</label>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-                Activo
-              </span>
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Roles</label>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
-                Administrador
-              </span>
-            </div>
-          </div>
-
-          <button className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition-colors duration-150">
-            Guardar cambios
-          </button>
-        </div>
+      <div className="flex flex-wrap gap-3">
+        <Badge color={usuario?.estado === 'activo' ? 'green' : 'gray'}>
+          Estado: {usuario?.estado ?? '-'}
+        </Badge>
+        {usuario?.is_staff && <Badge color="blue">Staff</Badge>}
+        {roles.map((rol) => (
+          <Badge key={rol} color="gray">
+            {rol}
+          </Badge>
+        ))}
       </div>
     </div>
   );

@@ -4,7 +4,8 @@ import MyProfileSection from '../components/MyProfileSection';
 import SubjectsSection from '../components/SubjectsSection';
 import PeriodsSection from '../components/PeriodsSection';
 import TeachersSection from '../components/TeachersSection';
-
+import GradesSection from '../components/GradesSection';
+import GuardiansSection from '../components/GuardiansSection';
 
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('profile');
@@ -17,8 +18,12 @@ export default function SettingsPage() {
         return <SubjectsSection />;
       case 'periods':
         return <PeriodsSection />;
+      case 'grades':
+        return <GradesSection />;
       case 'teachers':
         return <TeachersSection />;
+      case 'guardians':
+        return <GuardiansSection />;
       default:
         return <MyProfileSection />;
     }

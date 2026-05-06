@@ -1,64 +1,66 @@
-import { useState } from 'react'
-import { Plus } from 'lucide-react'
-import StatsCards from '../components/StatsCards'
-import FilterPanel from '../components/FilterPanel'
-import RecentActivityTable from '../components/RecentActivityTable'
-import AlertsPanel from '../components/AlertsPanel'
-import RevenueChartCard from '../components/RevenueChartCard'
-import { chartSeries, pendingAlerts, recentPayments } from '../data/mockData'
+import { useEffect, useState } from 'react';
+import { Card, SimpleGrid, Text, Alert } from '@mantine/core';
+import { studentsService } from '../../../services/studentsService';
+import { paymentsService } from '../../../services/paymentsService';
+import { obtenerMensajeError } from '../../../utils/apiErrors';
 
-function DashboardPage() {
-  const [desde, setDesde] = useState('01/04/2026')
-  const [hasta, setHasta] = useState('30/04/2026')
-  const [estado, setEstado] = useState('')
-  const [query, setQuery] = useState('')
-
-  const handleFilter = () => {
-    return
-  }
-
-  return (
-    <div className="flex min-h-screen bg-gray-100 font-sans">
-      <div className="flex min-w-0 flex-1 flex-col">
-        <main className="flex min-h-0 flex-1 flex-col gap-5 p-6">
-          <div className="flex items-center justify-between">
-            <nav className="flex items-center gap-1.5 text-sm text-gray-500">
-              <span className="cursor-pointer hover:text-gray-700">Dashboard</span>
-              <span className="text-gray-300">/</span>
-              <span className="font-semibold text-gray-800">Control de pagos</span>
-            </nav>
-            <button className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-green-700">
-              <Plus size={16} />
-              Registrar pago
-            </button>
-          </div>
-
-          <StatsCards />
-
-          <div className="grid grid-cols-12 gap-4 min-h-0 flex-1">
-            <div className="col-span-3 flex flex-col gap-4">
-              <FilterPanel
-                desde={desde}
-                setDesde={setDesde}
-                hasta={hasta}
-                setHasta={setHasta}
-                estado={estado}
-                setEstado={setEstado}
-                query={query}
-                setQuery={setQuery}
-                onFilter={handleFilter}
-              />
-              <AlertsPanel alerts={pendingAlerts} />
-            </div>
-            <div className="col-span-9 flex flex-col gap-4 min-w-0">
-              <RevenueChartCard series={chartSeries} />
-              <RecentActivityTable payments={recentPayments} />
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
-  )
+interface StatsState {
+  estudiantes: number;
+  cuentas: number;
+  pagos: number;
 }
 
-export default DashboardPage
+export default function DashboardPage() {
+  const [stats, setStats] = useState<StatsState>({ estudiantes: 0, cuentas: 0, pagos: 0 });
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const [estudiantesData, cuentasData, pagosData] = await Promise.all([
+          studentsService.listarEstudiantes({ page_size: 1 }),
+          paymentsService.listarCuentas({ page_size: 1 }),
+          paymentsService.listarPagos({ page_size: 1 }),
+        ]);
+        setStats({
+          estudiantes: estudiantesData.count,
+          cuentas: cuentasData.count,
+          pagos: pagosData.count,
+        });
+      } catch (err) {
+        setError(obtenerMensajeError(err, 'No se pudo cargar el resumen.'));
+      }
+    };
+
+    cargarDatos();
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <nav className="flex items-center gap-1.5 text-sm text-gray-500">
+          <span className="cursor-pointer hover:text-gray-700">Dashboard</span>
+          <span className="text-gray-300">/</span>
+          <span className="font-semibold text-gray-800">Resumen</span>
+        </nav>
+      </div>
+
+      {error && <Alert color="red">{error}</Alert>}
+
+      <SimpleGrid cols={3} spacing="lg">
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Text size="xs" c="dimmed" tt="uppercase">Estudiantes</Text>
+          <Text size="xl" fw={700}>{stats.estudiantes}</Text>
+        </Card>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Text size="xs" c="dimmed" tt="uppercase">Cuentas de cobro</Text>
+          <Text size="xl" fw={700}>{stats.cuentas}</Text>
+        </Card>
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Text size="xs" c="dimmed" tt="uppercase">Pagos registrados</Text>
+          <Text size="xl" fw={700}>{stats.pagos}</Text>
+        </Card>
+      </SimpleGrid>
+    </div>
+  );
+}

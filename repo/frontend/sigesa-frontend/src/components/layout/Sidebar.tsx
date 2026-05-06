@@ -15,17 +15,16 @@ const navItems: { key: NavItem; label: string; icon: ReactNode }[] = [
 export default function Sidebar() {
   return (
     <aside className="w-[110px] min-h-screen bg-white border-r border-gray-200 flex flex-col items-center pt-4 pb-6 gap-1 shadow-sm">
-      
       {/* Logo */}
       <div className="flex items-center justify-center w-16 h-16 mb-4">
         <GraduationCap size={42} className="text-amber-700" strokeWidth={1.5} />
       </div>
 
-      {/* Navegación */}
+      {/* Navegacion */}
       {navItems.map((item) => (
         <NavLink
           key={item.key}
-          to={`/dashboard/${item.key}`}
+          to={`/secretaria/${item.key}`}
           className={({ isActive }) =>
             `flex flex-col items-center gap-1.5 w-full py-3 px-2 transition-all duration-150 relative group
             ${

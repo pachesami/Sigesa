@@ -1,95 +1,78 @@
 import { useState } from 'react';
-import { User, Lock, Eye, EyeOff } from 'lucide-react';
-import { isSupabaseConfigured, supabase } from '../../../lib/supabase';
+import { Button, PasswordInput, Stack, TextInput, Alert } from '@mantine/core';
+import { Lock, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { authService } from '../../../services/authService';
+import { useAuth } from '../../../hooks/useAuth';
+import { obtenerMensajeError } from '../../../utils/apiErrors';
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { iniciarSesion, obtenerRutaPorUsuario } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    if (!isSupabaseConfigured || !supabase) {
-      setError('Falta configurar Supabase. Define VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en tu .env.local.');
+    try {
+      const data = await authService.login({ username, password });
+      iniciarSesion(data);
+      const ruta = obtenerRutaPorUsuario(data.usuario);
+      navigate(ruta, { replace: true });
+    } catch (err) {
+      setError(obtenerMensajeError(err, 'No se pudo iniciar sesion.'));
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: username,
-      password,
-    });
-
-    if (authError) {
-      setError('Usuario o contraseña incorrectos.');
-    }
-
-    setLoading(false);
   };
 
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-auto z-10">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Inicio de Sesión</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Inicio de Sesion</h2>
         <div className="mt-1 h-0.5 w-20 bg-[#D4A017]" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="flex items-center gap-1.5 text-sm text-gray-600 mb-1.5">
-            <User className="w-4 h-4" />
-            Usuario
-          </label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+      <form onSubmit={handleSubmit}>
+        <Stack gap="md">
+          <TextInput
+            label="Usuario"
             placeholder="Ingrese su usuario"
+            value={username}
+            onChange={(e) => setUsername(e.currentTarget.value)}
             required
-            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6B2D0E] focus:border-transparent transition"
+            leftSection={<User className="w-4 h-4" />}
           />
-        </div>
 
-        <div>
-          <label className="flex items-center gap-1.5 text-sm text-gray-600 mb-1.5">
-            <Lock className="w-4 h-4" />
-            Contraseña
-          </label>
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Ingrese su contraseña"
-              required
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-10 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6B2D0E] focus:border-transparent transition"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
-            >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
-          </div>
-        </div>
+          <PasswordInput
+            label="Contrasena"
+            placeholder="Ingrese su contrasena"
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
+            required
+            leftSection={<Lock className="w-4 h-4" />}
+          />
 
-        {error && (
-          <p className="text-red-500 text-xs text-center">{error}</p>
-        )}
+          {error && (
+            <Alert color="red" variant="light" title="Error">
+              {error}
+            </Alert>
+          )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-[#2E7D32] hover:bg-[#1B5E20] text-white font-bold tracking-widest py-3 rounded-lg uppercase text-sm transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Ingresando...' : 'INGRESAR'}
-        </button>
+          <Button
+            type="submit"
+            fullWidth
+            loading={loading}
+            className="bg-[#2E7D32] hover:bg-[#1B5E20]"
+          >
+            {loading ? 'Ingresando...' : 'Ingresar'}
+          </Button>
+        </Stack>
       </form>
 
       <div className="mt-6 flex flex-col items-center gap-3">
@@ -109,5 +92,3 @@ export default function LoginForm() {
     </div>
   );
 }
-
-

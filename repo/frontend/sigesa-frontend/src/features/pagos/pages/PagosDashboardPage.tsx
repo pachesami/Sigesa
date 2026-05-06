@@ -1,83 +1,99 @@
-import { useState } from 'react'
-import { Plus } from 'lucide-react'
-import Sidebar, { type NavItem } from '../../../components/layout/Sidebar'
-import Header from '../../../components/layout/Header'
-import StatsCards from '../components/StatsCards'
-import FilterPanel from '../components/FilterPanel'
-import PagosTable from '../components/PagosTable'
-import { payments as allPayments } from '../data/mockData'
-import type { Payment } from '../types'
+import { useEffect, useMemo, useState } from 'react';
+import { Button, Select, Table, TextInput, Alert } from '@mantine/core';
+import { paymentsService } from '../../../services/paymentsService';
+import type { CuentaCobro } from '../../../types/payments';
+import { obtenerMensajeError } from '../../../utils/apiErrors';
 
-const ITEMS_PER_PAGE = 8
-const TOTAL_ITEMS = 1200
-const TOTAL_PAGES = Math.ceil(TOTAL_ITEMS / ITEMS_PER_PAGE)
+export default function PagosDashboardPage() {
+  const [cuentas, setCuentas] = useState<CuentaCobro[]>([]);
+  const [estado, setEstado] = useState('');
+  const [busqueda, setBusqueda] = useState('');
+  const [error, setError] = useState('');
+  const [cargando, setCargando] = useState(false);
 
-function PagosDashboardPage() {
-  const [activeNav, setActiveNav] = useState<NavItem>('pagos')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [desde, setDesde] = useState('01/04/2024')
-  const [estado, setEstado] = useState('')
-  const [grado, setGrado] = useState('')
-  const [filteredPayments, setFilteredPayments] = useState<Payment[]>(allPayments)
-
-  const handleFilter = () => {
-    let result = allPayments
-
-    if (estado) {
-      result = result.filter((p) => p.estado === estado)
+  const cargarCuentas = async () => {
+    try {
+      setCargando(true);
+      const data = await paymentsService.listarCuentas({ page_size: 200, estado: estado || undefined });
+      setCuentas(data.results);
+    } catch (err) {
+      setError(obtenerMensajeError(err, 'No se pudieron cargar los pagos.'));
+    } finally {
+      setCargando(false);
     }
+  };
 
-    if (grado) {
-      result = result.filter((p) => p.grado === grado)
-    }
+  useEffect(() => {
+    cargarCuentas();
+  }, [estado]);
 
-    setFilteredPayments(result)
-    setCurrentPage(1)
-  }
+  const cuentasFiltradas = useMemo(() => {
+    if (!busqueda) return cuentas;
+    const valor = busqueda.toLowerCase();
+    return cuentas.filter((cuenta) => String(cuenta.id_matricula).includes(valor));
+  }, [busqueda, cuentas]);
 
   return (
-    <div className="flex min-h-screen bg-gray-100 font-sans">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <nav className="flex items-center gap-1.5 text-sm text-gray-500">
+          <span className="cursor-pointer hover:text-gray-700">Dashboard</span>
+          <span className="text-gray-300">/</span>
+          <span className="font-semibold text-gray-800">Pagos</span>
+        </nav>
+        <Button className="bg-green-600 hover:bg-green-700">Nuevo Pago</Button>
+      </div>
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      {error && <Alert color="red">{error}</Alert>}
 
-        <main className="flex min-h-0 flex-1 flex-col gap-5 p-6">
-          <div className="flex items-center justify-between">
-            <nav className="flex items-center gap-1.5 text-sm text-gray-500">
-              <span className="cursor-pointer hover:text-gray-700">Dashboard</span>
-              <span className="text-gray-300">/</span>
-              <span className="font-semibold text-gray-800">Pagos</span>
-            </nav>
-            <button className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-150 hover:bg-green-700">
-              <Plus size={16} />
-              Nuevo Pago
-            </button>
-          </div>
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-4">
+        <div className="flex flex-wrap gap-3">
+          <TextInput
+            placeholder="Buscar matricula"
+            value={busqueda}
+            onChange={(event) => setBusqueda(event.currentTarget.value)}
+          />
+          <Select
+            placeholder="Estado"
+            data={['pendiente', 'pagada', 'vencida', 'anulada']}
+            value={estado}
+            onChange={(value) => setEstado(value ?? '')}
+            clearable
+          />
+          <Button variant="default" onClick={cargarCuentas} loading={cargando}>
+            Actualizar
+          </Button>
+        </div>
 
-          <StatsCards />
-
-          <div className="flex min-h-0 flex-1 gap-4">
-            <FilterPanel
-              desde={desde}
-              setDesde={setDesde}
-              estado={estado}
-              setEstado={setEstado}
-              grado={grado}
-              setGrado={setGrado}
-              onFilter={handleFilter}
-            />
-            <PagosTable
-              payments={filteredPayments}
-              currentPage={currentPage}
-              totalPages={TOTAL_PAGES}
-              totalItems={TOTAL_ITEMS}
-              itemsPerPage={ITEMS_PER_PAGE}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        </main>
+        <div className="overflow-x-auto">
+          <Table striped highlightOnHover withTableBorder>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Cuenta</Table.Th>
+                <Table.Th>Matricula</Table.Th>
+                <Table.Th>Concepto</Table.Th>
+                <Table.Th>Mes</Table.Th>
+                <Table.Th>Ano</Table.Th>
+                <Table.Th>Valor</Table.Th>
+                <Table.Th>Estado</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {cuentasFiltradas.map((cuenta) => (
+                <Table.Tr key={cuenta.id_cuenta}>
+                  <Table.Td>{cuenta.id_cuenta}</Table.Td>
+                  <Table.Td>{cuenta.id_matricula}</Table.Td>
+                  <Table.Td>{cuenta.id_concepto_pago}</Table.Td>
+                  <Table.Td>{cuenta.mes}</Table.Td>
+                  <Table.Td>{cuenta.year}</Table.Td>
+                  <Table.Td>{cuenta.valor_deuda}</Table.Td>
+                  <Table.Td className="capitalize">{cuenta.estado}</Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default PagosDashboardPage

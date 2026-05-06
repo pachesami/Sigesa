@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Button, Group, Table, TextInput, Alert } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { academicService } from '../../../services/academicService';
+import { studentsService } from '../../../services/studentsService';
 import { usersService } from '../../../services/usersService';
-import type { Docente } from '../../../types/academic';
+import type { Acudiente } from '../../../types/students';
 import { obtenerMensajeError } from '../../../utils/apiErrors';
 
-export default function TeachersSection() {
-  const [docentes, setDocentes] = useState<Docente[]>([]);
+export default function GuardiansSection() {
+  const [acudientes, setAcudientes] = useState<Acudiente[]>([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,34 +22,34 @@ export default function TeachersSection() {
     },
   });
 
-  const cargarDocentes = async () => {
+  const cargarAcudientes = async () => {
     try {
       setCargando(true);
-      const data = await academicService.listarDocentes({ page_size: 100 });
-      setDocentes(data.results);
+      const data = await studentsService.listarAcudientes({ page_size: 100 });
+      setAcudientes(data.results);
     } catch (err) {
-      setError(obtenerMensajeError(err, 'No se pudieron cargar los docentes.'));
+      setError(obtenerMensajeError(err, 'No se pudieron cargar los acudientes.'));
     } finally {
       setCargando(false);
     }
   };
 
   useEffect(() => {
-    cargarDocentes();
+    cargarAcudientes();
   }, []);
 
-  const obtenerRolDocente = async () => {
+  const obtenerRolAcudiente = async () => {
     const data = await usersService.listarRoles({ page_size: 100 });
-    const rol = data.results.find((item) => item.nombre === 'Docente');
+    const rol = data.results.find((item) => item.nombre === 'Acudiente');
     return rol?.id_rol;
   };
 
   const handleSubmit = async (values: typeof form.values) => {
     setError('');
     try {
-      const idRol = await obtenerRolDocente();
+      const idRol = await obtenerRolAcudiente();
       if (!idRol) {
-        setError('No existe el rol Docente.');
+        setError('No existe el rol Acudiente.');
         return;
       }
 
@@ -60,34 +60,37 @@ export default function TeachersSection() {
         estado: 'activo',
       });
 
-      await academicService.crearDocente({
+      await studentsService.crearAcudiente({
         cedula: values.cedula,
         nombre: values.nombre,
         telefono: values.telefono || null,
         correo: values.correo || null,
+        direccion: null,
+        direccion_trabajo: null,
+        telefono_trabajo: null,
         id_usuario: usuario.id_usuario,
       });
 
       form.reset();
-      await cargarDocentes();
+      await cargarAcudientes();
     } catch (err) {
-      setError(obtenerMensajeError(err, 'No se pudo registrar el docente.'));
+      setError(obtenerMensajeError(err, 'No se pudo registrar el acudiente.'));
     }
   };
 
   const handleEliminar = async (cedula: string) => {
     setError('');
     try {
-      await academicService.eliminarDocente(cedula);
-      await cargarDocentes();
+      await studentsService.eliminarAcudiente(cedula);
+      await cargarAcudientes();
     } catch (err) {
-      setError(obtenerMensajeError(err, 'No se pudo eliminar el docente.'));
+      setError(obtenerMensajeError(err, 'No se pudo eliminar el acudiente.'));
     }
   };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm space-y-6">
-      <h2 className="text-lg font-bold text-gray-800">Docentes</h2>
+      <h2 className="text-lg font-bold text-gray-800">Acudientes</h2>
 
       {error && <Alert color="red">{error}</Alert>}
 
@@ -121,14 +124,14 @@ export default function TeachersSection() {
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {docentes.map((docente) => (
-              <Table.Tr key={docente.cedula}>
-                <Table.Td>{docente.cedula}</Table.Td>
-                <Table.Td>{docente.nombre}</Table.Td>
-                <Table.Td>{docente.correo ?? '-'}</Table.Td>
-                <Table.Td>{docente.telefono ?? '-'}</Table.Td>
+            {acudientes.map((acudiente) => (
+              <Table.Tr key={acudiente.cedula}>
+                <Table.Td>{acudiente.cedula}</Table.Td>
+                <Table.Td>{acudiente.nombre}</Table.Td>
+                <Table.Td>{acudiente.correo ?? '-'}</Table.Td>
+                <Table.Td>{acudiente.telefono ?? '-'}</Table.Td>
                 <Table.Td>
-                  <Button variant="light" color="red" size="xs" onClick={() => handleEliminar(docente.cedula)}>
+                  <Button variant="light" color="red" size="xs" onClick={() => handleEliminar(acudiente.cedula)}>
                     Eliminar
                   </Button>
                 </Table.Td>

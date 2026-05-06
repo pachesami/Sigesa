@@ -1,4 +1,4 @@
-import { User, BookOpen, Calendar, Users } from 'lucide-react';
+import { User, BookOpen, Calendar, Users, GraduationCap, Shield } from 'lucide-react';
 
 interface SettingsSidebarProps {
   activeSection: string;
@@ -14,8 +14,10 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { id: 'profile', label: 'Mi perfil', icon: <User size={18} /> },
   { id: 'subjects', label: 'Materias', icon: <BookOpen size={18} /> },
-  { id: 'periods', label: 'Períodos', icon: <Calendar size={18} /> },
+  { id: 'periods', label: 'Periodos', icon: <Calendar size={18} /> },
+  { id: 'grades', label: 'Grados', icon: <GraduationCap size={18} /> },
   { id: 'teachers', label: 'Docentes', icon: <Users size={18} /> },
+  { id: 'guardians', label: 'Acudientes', icon: <Shield size={18} /> },
 ];
 
 export default function SettingsSidebar({ activeSection, onSelectSection }: SettingsSidebarProps) {
