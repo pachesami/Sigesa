@@ -25,6 +25,14 @@ const limpiarUsuario = () => {
   localStorage.removeItem(CLAVE_USUARIO);
 };
 
+const normalizarRol = (valor: string) => valor.trim().toLowerCase();
+
+const mapearRol = (valor: string) => {
+  const rol = normalizarRol(valor);
+  if (rol === 'profesor') return 'docente';
+  return rol;
+};
+
 export type AuthContextValue = {
   usuario: Usuario | null;
   tokens: Tokens | null;
@@ -45,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const obtenerRoles = useCallback((valor: Usuario | null) => {
     if (!valor) return [] as string[];
-    return valor.roles?.map((rol) => rol.rol.nombre) ?? [];
+    return valor.roles?.map((rol) => mapearRol(rol.rol.nombre)) ?? [];
   }, []);
 
   const tieneRol = useCallback(
@@ -53,10 +61,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!usuario) return false;
       if (roles.length === 0) return true;
       const rolesUsuario = obtenerRoles(usuario);
-      if (roles.includes('Secretaria') && usuario.is_staff) {
+      const rolesPermitidos = roles.map(mapearRol);
+      if (rolesPermitidos.includes('secretaria') && usuario.is_staff) {
         return true;
       }
-      return roles.some((rol) => rolesUsuario.includes(rol));
+      return rolesPermitidos.some((rol) => rolesUsuario.includes(rol));
     },
     [obtenerRoles, usuario]
   );
@@ -64,13 +73,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const obtenerRutaPorUsuario = useCallback(
     (valor: Usuario) => {
       const rolesUsuario = obtenerRoles(valor);
-      if (valor.is_staff || rolesUsuario.includes('Secretaria')) {
+      if (valor.is_staff || rolesUsuario.includes('secretaria')) {
         return '/secretaria/dashboard';
       }
-      if (rolesUsuario.includes('Docente')) {
+      if (rolesUsuario.includes('docente')) {
         return '/docente/dashboard';
       }
-      if (rolesUsuario.includes('Acudiente')) {
+      if (rolesUsuario.includes('acudiente')) {
         return '/acudiente/dashboard';
       }
       return '/login';

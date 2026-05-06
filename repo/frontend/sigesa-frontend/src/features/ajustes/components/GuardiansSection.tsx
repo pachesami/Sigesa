@@ -6,6 +6,8 @@ import { usersService } from '../../../services/usersService';
 import type { Acudiente } from '../../../types/students';
 import { obtenerMensajeError } from '../../../utils/apiErrors';
 
+const normalizarRol = (valor: string) => valor.trim().toLowerCase();
+
 export default function GuardiansSection() {
   const [acudientes, setAcudientes] = useState<Acudiente[]>([]);
   const [cargando, setCargando] = useState(false);
@@ -40,7 +42,7 @@ export default function GuardiansSection() {
 
   const obtenerRolAcudiente = async () => {
     const data = await usersService.listarRoles({ page_size: 100 });
-    const rol = data.results.find((item) => item.nombre === 'Acudiente');
+    const rol = data.results.find((item) => normalizarRol(item.nombre) === 'acudiente');
     return rol?.id_rol;
   };
 

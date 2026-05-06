@@ -6,6 +6,8 @@ import { usersService } from '../../../services/usersService';
 import type { Docente } from '../../../types/academic';
 import { obtenerMensajeError } from '../../../utils/apiErrors';
 
+const normalizarRol = (valor: string) => valor.trim().toLowerCase();
+
 export default function TeachersSection() {
   const [docentes, setDocentes] = useState<Docente[]>([]);
   const [cargando, setCargando] = useState(false);
@@ -40,7 +42,10 @@ export default function TeachersSection() {
 
   const obtenerRolDocente = async () => {
     const data = await usersService.listarRoles({ page_size: 100 });
-    const rol = data.results.find((item) => item.nombre === 'Docente');
+    const rol = data.results.find((item) => {
+      const nombre = normalizarRol(item.nombre);
+      return nombre === 'docente' || nombre === 'profesor';
+    });
     return rol?.id_rol;
   };
 
@@ -49,7 +54,7 @@ export default function TeachersSection() {
     try {
       const idRol = await obtenerRolDocente();
       if (!idRol) {
-        setError('No existe el rol Docente.');
+        setError('No existe el rol Docente/Profesor.');
         return;
       }
 
