@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import StudentForm from '../components/StudentForm';
-import GuardiansList from '../components/GuardiansList';
-import GuardianModal from '../components/GuardianModal';
-import type { GuardianFormData } from '../components/GuardianModal';
 import { studentsService } from '../../../services/studentsService';
+import { academicService } from '../../../services/academicService';
+import type { Grado } from '../../../types/academic';
 import { obtenerMensajeError } from '../../../utils/apiErrors';
 
 interface StudentFormData {
@@ -13,75 +12,83 @@ interface StudentFormData {
   bloodType: string;
   address: string;
   observations: string;
+  guardianIdentity: string;
+  guardianName: string;
+  guardianAddress: string;
+  guardianPhone: string;
+  guardianWorkAddress: string;
+  guardianWorkPhone: string;
+  guardianEmail: string;
+  guardianRelationship: string;
+  guardianIsPrimary: boolean;
+  gradeId: string;
+  enrollmentYear: string;
+  enrollmentDate: string;
+  enrollmentStatus: string;
 }
 
 export default function StudentsPage() {
-  const [guardians, setGuardians] = useState<GuardianFormData[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [studentId, setStudentId] = useState<string | null>(null);
-  const [loadingStudent, setLoadingStudent] = useState(false);
-  const [loadingGuardian, setLoadingGuardian] = useState(false);
-  const [errorStudent, setErrorStudent] = useState('');
-  const [errorGuardian, setErrorGuardian] = useState('');
+  const [grados, setGrados] = useState<Grado[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const cargarGrados = async () => {
+    try {
+      const data = await academicService.listarGrados({ page_size: 100 });
+      setGrados(data.results);
+    } catch (err) {
+      setError(obtenerMensajeError(err, 'No se pudieron cargar los grados.'));
+    }
+  };
+
+  useEffect(() => {
+    cargarGrados();
+  }, []);
 
   const handleSaveStudent = async (data: StudentFormData) => {
-    setErrorStudent('');
+    setError('');
     try {
-      setLoadingStudent(true);
-      const estudiante = await studentsService.crearEstudiante({
-        numero_identidad: data.identity,
-        nombre: data.fullName,
-        fecha_nacimiento: data.dateOfBirth || null,
-        rh: data.bloodType || null,
-        direccion: data.address || null,
-        observaciones: data.observations || null,
+      setLoading(true);
+      await studentsService.registroCompleto({
+        estudiante: {
+          numero_identidad: data.identity,
+          nombre: data.fullName,
+          fecha_nacimiento: data.dateOfBirth || null,
+          rh: data.bloodType || null,
+          direccion: data.address || null,
+          observaciones: data.observations || null,
+        },
+        matricula: {
+          id_grado: Number(data.gradeId),
+          year: Number(data.enrollmentYear),
+          fecha_matricula: data.enrollmentDate,
+          estado: data.enrollmentStatus,
+        },
+        acudientes: [
+          {
+            cedula: data.guardianIdentity,
+            nombre: data.guardianName,
+            direccion: data.guardianAddress || null,
+            telefono: data.guardianPhone || null,
+            direccion_trabajo: data.guardianWorkAddress || null,
+            telefono_trabajo: data.guardianWorkPhone || null,
+            correo: data.guardianEmail || null,
+            parentesco: data.guardianRelationship,
+            acudiente_principal: data.guardianIsPrimary,
+          },
+        ],
       });
-      setStudentId(estudiante.numero_identidad);
     } catch (err) {
-      setErrorStudent(obtenerMensajeError(err, 'No se pudo guardar el estudiante.'));
+      setError(obtenerMensajeError(err, 'No se pudo guardar el registro.'));
     } finally {
-      setLoadingStudent(false);
+      setLoading(false);
     }
   };
 
-  const handleAddGuardian = async (guardian: GuardianFormData) => {
-    if (!studentId) {
-      setErrorGuardian('Primero registra al estudiante.');
-      return;
-    }
-    setErrorGuardian('');
-    try {
-      setLoadingGuardian(true);
-      const acudiente = await studentsService.crearAcudiente({
-        cedula: guardian.identity,
-        nombre: guardian.name,
-        direccion: guardian.address || null,
-        telefono: guardian.phone || null,
-        direccion_trabajo: guardian.workAddress || null,
-        telefono_trabajo: guardian.workPhone || null,
-        correo: guardian.email || null,
-        id_usuario: null,
-      });
-
-      await studentsService.crearRelacion({
-        id_estudiante: studentId,
-        id_acudiente: acudiente.cedula,
-        parentesco: guardian.relationship,
-        acudiente_principal: guardian.isPrimary,
-      });
-
-      setGuardians((prev) => [...prev, guardian]);
-      setIsModalOpen(false);
-    } catch (err) {
-      setErrorGuardian(obtenerMensajeError(err, 'No se pudo registrar el acudiente.'));
-    } finally {
-      setLoadingGuardian(false);
-    }
-  };
-
-  const handleRemoveGuardian = (index: number) => {
-    setGuardians((prev) => prev.filter((_, i) => i !== index));
-  };
+  const opcionesGrados = grados.map((grado) => ({
+    value: String(grado.id_grado),
+    label: `${grado.nombre}${grado.docente_nombre ? ` - ${grado.docente_nombre}` : ''}`,
+  }));
 
   return (
     <div className="space-y-6">
@@ -93,15 +100,7 @@ export default function StudentsPage() {
         </nav>
       </div>
 
-      <StudentForm onSave={handleSaveStudent} loading={loadingStudent} error={errorStudent} />
-      <GuardiansList guardians={guardians} onAddClick={() => setIsModalOpen(true)} onRemove={handleRemoveGuardian} />
-      <GuardianModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAdd={handleAddGuardian}
-        loading={loadingGuardian}
-        error={errorGuardian}
-      />
+      <StudentForm onSave={handleSaveStudent} loading={loading} error={error} gradeOptions={opcionesGrados} />
     </div>
   );
 }

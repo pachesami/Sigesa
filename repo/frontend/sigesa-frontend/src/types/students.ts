@@ -1,3 +1,5 @@
+import type { MatriculaEstado } from './enrollment';
+
 export type Estudiante = {
   numero_identidad: string;
   nombre: string;
@@ -30,4 +32,29 @@ export type RelacionEA = {
 
 export type EstudianteDetail = Estudiante & {
   acudientes: RelacionEA[];
+};
+
+export type AcudienteRegistro = {
+  cedula: string;
+  nombre: string;
+  direccion: string | null;
+  telefono: string | null;
+  direccion_trabajo: string | null;
+  telefono_trabajo: string | null;
+  correo: string | null;
+  parentesco: string | null;
+  acudiente_principal: boolean;
+};
+
+export type MatriculaRegistro = {
+  id_grado: number;
+  year: number;
+  fecha_matricula: string;
+  estado: MatriculaEstado;
+};
+
+export type RegistroEstudiantePayload = {
+  estudiante: Estudiante;
+  matricula: MatriculaRegistro;
+  acudientes: AcudienteRegistro[];
 };

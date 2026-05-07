@@ -1,8 +1,12 @@
 from rest_framework import viewsets
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from .models import Acudiente, Estudiante, RelacionEA
 from .serializers import (
+    RegistroEstudianteSerializer,
     AcudienteSerializer, EstudianteDetailSerializer,
     EstudianteSerializer, RelacionEASerializer,
 )
@@ -49,3 +53,16 @@ class RelacionEAViewSet(viewsets.ModelViewSet):
         if self.action in ["list", "retrieve"]:
             return [IsAuthenticated()]
         return [IsAdminUser()]
+
+
+class RegistroEstudianteView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        serializer = RegistroEstudianteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.save()
+        return Response(data, status=status.HTTP_201_CREATED)
+
+
+

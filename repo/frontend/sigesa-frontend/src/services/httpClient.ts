@@ -21,6 +21,9 @@ const resolverCola = (token: string | null) => {
 };
 
 httpClient.interceptors.request.use((config) => {
+  const url = config.url ?? '';
+  const esEndpointPublico = url.includes('/auth/login/') || url.includes('/auth/refresh/');
+  if (esEndpointPublico) return config;
   const tokens = obtenerTokens();
   if (tokens?.access) {
     config.headers = config.headers ?? {};
@@ -92,3 +95,5 @@ httpClient.interceptors.response.use(
 );
 
 export default httpClient;
+
+

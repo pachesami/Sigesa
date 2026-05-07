@@ -1,6 +1,6 @@
 import httpClient from './httpClient';
 import type { ApiList, ListParams } from '../types/api';
-import type { Acudiente, Estudiante, EstudianteDetail, RelacionEA } from '../types/students';
+import type { Acudiente, Estudiante, EstudianteDetail, RelacionEA, RegistroEstudiantePayload } from '../types/students';
 
 export type RelacionCreate = Omit<RelacionEA, 'id_relacion' | 'estudiante_nombre' | 'acudiente_nombre'>;
 
@@ -61,5 +61,9 @@ export const studentsService = {
   },
   eliminarRelacion: async (idRelacion: number) => {
     await httpClient.delete(`/students/relaciones/${idRelacion}/`);
+  },
+  registroCompleto: async (payload: RegistroEstudiantePayload) => {
+    const { data } = await httpClient.post('/students/registro-completo/', payload);
+    return data;
   },
 };
